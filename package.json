@@ -3,9 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon ./bin/www --watch"
+    "dev": " tsc -p tsconfig.dev.json & nodemon ./bin/www --watch",
+    "build": " tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@types/body-parser": "^1.16.4",
+    "@types/cookie-parser": "^1.4.0",
+    "@types/express": "^4.0.36",
+    "@types/morgan": "^1.7.32",
+    "@types/node": "^8.0.20",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
