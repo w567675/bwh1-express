@@ -1,0 +1,1 @@
+import * as passportLocal from "passport-local";
