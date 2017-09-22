@@ -41,6 +41,8 @@
     "testEnvironment": "node"
   },
   "dependencies": {
+    "@types/multer": "^1.3.2",
+    "@types/mysql": "0.0.34",
     "@types/passport-local": "^1.0.30",
     "async": "^2.1.2",
     "bcrypt-nodejs": "^0.0.3",
@@ -58,6 +60,8 @@
     "lusca": "^1.4.1",
     "mongoose": "^4.6.6",
     "morgan": "^1.7.0",
+    "multer": "^1.3.0",
+    "mysql": "^2.14.1",
     "nodemailer": "^2.6.4",
     "passport": "0.3.2",
     "passport-facebook": "^2.1.1",

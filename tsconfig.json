@@ -7,17 +7,17 @@
         "sourceMap": true,
         "outDir": "dist",
         "baseUrl": ".",
-        "typeRoots": [
-            "./typings"
-        ]
-        // "paths": {
-        //     "*": [
-        //         "node_modules/*",
-        //         "src/typings/*"
-        //     ]
-        // }
+        "paths": {
+            "*": [
+                "node_modules/*",
+                "src/typings/*"
+            ]
+        }
     },
     "include": [
-        "xxx/**/*"
+        "./src/**/*"
+    ],
+    "exclude": [
+        "./_temp/**/*"
     ]
 }

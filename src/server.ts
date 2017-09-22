@@ -15,9 +15,16 @@ import * as path from "path";
 import * as mongoose from "mongoose";
 import * as passport from "passport";
 import expressValidator = require("express-validator");
+import * as multer from 'multer';
+
+import { EventEmitter } from 'events';
+import * as zlib from 'zlib';
+import * as fs from 'fs';
+import * as dns from 'dns';
+import * as http from 'http';
 
 
-const MongoStore = mongo(session);
+
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -38,10 +45,23 @@ import * as contactController from "./controllers/contact";
  */
 import * as passportConfig from "./config/passport";
 
+import * as mysql from "mysql";
+
+const connection = mysql.createConnection({
+	host: '127.0.0.1',
+	user: 'root',
+	password: '123456',
+	port: 3310,
+	database: 'bwh1-express',
+});
+
+
 /**
  * Create Express server.
  */
 const app = express();
+
+
 
 /**
  * Connect to MongoDB.
@@ -68,6 +88,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(expressValidator());
 // app.use(session({
+
 //   resave: true,
 //   saveUninitialized: true,
 //   secret: process.env.SESSION_SECRET,
@@ -99,11 +120,108 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //   }
 //   next();
 // });
-app.use('/', (req, res, next) => {
-  res.send(200);
-});
-app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }));
 
+const a = Buffer.alloc(10);
+const b = Buffer.from([1,2,3]);
+const c = a.compare(b);
+a.write('abc');
+
+app.use('/static', express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }));
+app.use('/static', express.static(path.join(__dirname, "../uploads"), { maxAge: 31557600000 }));
+app.get('/', (req, res, next) => {
+	const sql = 'SELECT * FROM jh_holiday_logs';
+
+	connection.query(sql, (error, result) => {
+		if (error) {
+			res.json(200, { status: 1, message: error });
+			return console.log(error);
+		}
+		res.json(200, { status: 0, result })
+	});
+});
+app.get('/database/:name', (req, res) => {
+	const {
+		name,
+	} = req.params;
+	const sql = `CREATE DATABASE ${name}`;
+	connection.query(sql, (error, results) => {
+		if (error) {
+			return res.json(200, {
+				status: 1,
+				message: error,
+			});
+		}
+		res.json(200, {
+			status: 1,
+			message: results
+		});
+	});
+});
+
+app.get('/table/:name', (req, res) => {
+	const {
+		name,
+	} = req.params;
+	const sql = `
+		CREATE TABLE \`${name}\` (
+			\`id\` int(11) NOT NULL AUTO_INCREMENT COMMENT '员工信息表',
+			\`name\` varchar(50) DEFAULT NULL COMMENT '姓名',
+			\`annual_holiday\` decimal(10,2) DEFAULT '0.00' COMMENT '年假时间',
+			\`tone_rests\` decimal(10,2) DEFAULT '0.00' COMMENT '调休时间',
+			\`remark\` varchar(255) DEFAULT NULL COMMENT '备注',
+			PRIMARY KEY (\`id\`)
+		) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;
+	`;
+	connection.query(sql, (error, results) => {
+		if (error) {
+			return res.json(200, {
+				status: 1,
+				message: error,
+			});
+		}
+		res.json(200, {
+			status: 1,
+			message: results
+		});
+	});
+});
+
+
+
+app.get('/upload', (req, res) => {
+	res.sendFile(path.resolve(__dirname, '../views/_temp/upload.html'));
+}).post('/upload', (req, res, next) => {
+	const upload = multer({ dest: '_temp/_uploads' });
+	upload.single('file')(req, res, (error) => {
+		if (error) {
+			res.json(200, {
+				status: 1,
+				message: error
+			});
+			return console.log(error);
+		}
+		next();
+	});
+}, (req, res) => {
+	const {
+		originalname,
+		path,
+	} = req.file;
+	fs.readFile(path, (error, data) => {
+		if (error) {
+			return console.log(error);
+		}
+		const fileName = `${Date.now()}${originalname}`
+		const filePath = `uploads/${fileName}`;
+		fs.writeFile(filePath, data, (error) => {
+			if (error) {
+				return console.log(error);
+			}
+			res.json(200, { status: 0, message: 'success', url: `http://127.0.0.1:3000/static/${fileName}` });
+		})
+	})
+
+});
 // /**
 //  * Primary app routes.
 //  */
@@ -149,8 +267,8 @@ app.use(errorHandler());
  * Start Express server.
  */
 app.listen(app.get("port"), () => {
-  console.log(("  App is running at http://localhost:%d in %s mode"), app.get("port"), app.get("env"));
-  console.log("  Press CTRL-C to stop\n");
+	console.log(("  App is running at http://localhost:%d in %s mode"), app.get("port"), app.get("env"));
+	console.log("  Press CTRL-C to stop\n");
 });
 
 module.exports = app;
