@@ -1,8 +1,15 @@
 version: '2.1'
 
 services:
+  mysql:
+    image: mysql
+    ports:
+      - 3311:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
   bwh1-express:
     image: bwh1-express
     build: .
     ports:
-      - 3020:3020
+      - 3010:3000
+  

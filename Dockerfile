@@ -1,8 +1,17 @@
 FROM node:8.5.0
-ENV NODE_ENV production
+
+# Create app directory
 WORKDIR /usr/src/app
-COPY ["package.json", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
+
+# Install app dependencies
+COPY package.json .
+# For npm@5 or later, copy package-lock.json as well
+# COPY package.json package-lock.json ./
+RUN npm install -g typescript --registry=https://registry.npm.taobao.org
+RUN npm install --registry=https://registry.npm.taobao.org
+
+# Bundle app source
 COPY . .
-EXPOSE 3020
-CMD npm start
+
+EXPOSE 3000
+CMD [ "npm", "start" ]

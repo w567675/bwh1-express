@@ -48,7 +48,7 @@ import * as passportConfig from "./config/passport";
 import * as mysql from "mysql";
 
 const connection = mysql.createConnection({
-	host: '127.0.0.1',
+	host: '172.16.14.25',
 	user: 'root',
 	password: '123456',
 	port: 3310,
@@ -133,10 +133,10 @@ app.get('/', (req, res, next) => {
 
 	connection.query(sql, (error, result) => {
 		if (error) {
-			res.json(200, { status: 1, message: error });
+			res.status(200).json({status: 1, message: error })
 			return console.log(error);
 		}
-		res.json(200, { status: 0, result })
+		res.status(200).json({ status: 0, result })
 	});
 });
 app.get('/database/:name', (req, res) => {
@@ -146,12 +146,12 @@ app.get('/database/:name', (req, res) => {
 	const sql = `CREATE DATABASE ${name}`;
 	connection.query(sql, (error, results) => {
 		if (error) {
-			return res.json(200, {
+			return res.status(200).json({
 				status: 1,
 				message: error,
 			});
 		}
-		res.json(200, {
+		res.status(200).json({
 			status: 1,
 			message: results
 		});
@@ -174,12 +174,12 @@ app.get('/table/:name', (req, res) => {
 	`;
 	connection.query(sql, (error, results) => {
 		if (error) {
-			return res.json(200, {
+			return res.status(200).json({
 				status: 1,
 				message: error,
 			});
 		}
-		res.json(200, {
+		res.status(200).json({
 			status: 1,
 			message: results
 		});
@@ -194,7 +194,7 @@ app.get('/upload', (req, res) => {
 	const upload = multer({ dest: '_temp/_uploads' });
 	upload.single('file')(req, res, (error) => {
 		if (error) {
-			res.json(200, {
+			res.status(200).json({
 				status: 1,
 				message: error
 			});
@@ -217,7 +217,7 @@ app.get('/upload', (req, res) => {
 			if (error) {
 				return console.log(error);
 			}
-			res.json(200, { status: 0, message: 'success', url: `http://127.0.0.1:3000/static/${fileName}` });
+			res.status(200).json({ status: 0, message: 'success', url: `http://127.0.0.1:3000/static/${fileName}` });
 		})
 	})
 
